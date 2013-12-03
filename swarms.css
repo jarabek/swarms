@@ -16,7 +16,7 @@
     top:0px;
     left:0px;
     bottom:0px;
-    background-color:#333333;
+    background-color:#aaaaaa;
 }
 
 .content
@@ -24,12 +24,11 @@
     bottom:0px;
     height:500px;
     width:100%;
-    background-color:#dddddd;
 }
 
 #swarm_canvas
 {
-    background-color:#aaaaaa;
+    background-color:#dddddd;
     position:fixed;
     float:left;
     height:500px;

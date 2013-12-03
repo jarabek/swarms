@@ -1,3 +1,9 @@
+var swarms = angular.module("swarmApp", []);
+
+swarms.controller('SwarmsController', function($scope){
+
+});
+
 var setDimentions = function(){
 	var newHeight = document.documentElement.clientHeight;
 	$('.content').height(newHeight);
