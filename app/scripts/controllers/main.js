@@ -2,8 +2,12 @@
 'use strict';
 
 angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
-	window.console.log($scope);
-	var setDimentions = function(){
+	$scope.mouse = {};
+	$scope.mouse.mouseCapture = false;
+	$scope.mouse.lastX = 0;
+	$scope.mouse.lastY = 0;
+
+	$scope.setDimentions = function(){
 		var newHeight = document.documentElement.clientHeight;
 		$('.content').height(newHeight);
 		$('.sidebar').height(newHeight);
@@ -16,43 +20,42 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		$('#swarm_canvas')[0].width = newWidth;
 	};
 
-	$( document ).ready(setDimentions);
-	$( window ).resize(setDimentions);
+	$( document ).ready($scope.setDimentions);
+	$( window ).resize($scope.setDimentions);
 
-	var mouseCapture = false;
-	var lastX = null;
-	var lastY = null;
-
-	var move = function(e){
+	$scope.move = function(e){
 		var x = e.offsetX;
 		var y = e.offsetY;
-		$('#x').val(x);
-		$('#y').val(y);
-		if (mouseCapture){
+		$scope.mouse.mouseX = x;
+		$scope.mouse.mouseY = y;
+		if ($scope.mouse.mouseCapture){
 		  var c = document.getElementById('swarm_canvas');
 		  var ctx = c.getContext('2d');
 		  ctx.beginPath();
-		  ctx.moveTo(lastX,lastY);
+		  ctx.moveTo($scope.mouse.lastX,$scope.mouse.lastY);
 		  ctx.lineTo(x,y);
 		  ctx.stroke();
 		}
-		lastX = x;
-		lastY = y;
+		$scope.mouse.lastX = x;
+		$scope.mouse.lastY = y;
+		$scope.$apply();
 	};
 
-	var clickDown = function(e){
+	$scope.clickDown = function(e){
 		e.preventDefault();
-		mouseCapture = true;
-		$('#button').val(e.button);
+		$scope.mouse.mouseCapture = true;
+		$scope.mouse.mouseBtn = e.button;
+		$scope.$apply();
 	};
 
-	var clickUp = function(e){
+	$scope.clickUp = function(e){
 		e.preventDefault();
-		mouseCapture = false;
-		$('#button').val('None');
+		$scope.mouse.mouseCapture = false;
+		$scope.mouse.mouseBtn = 'None';
+		$scope.$apply();
 	};
 
-	$('#swarm_canvas').bind('mousemove', move);
-	$('#swarm_canvas').bind('mousedown', clickDown);
-	$('#swarm_canvas').bind('mouseup', clickUp);
+	$('#swarm_canvas').bind('mousemove', $scope.move);
+	$('#swarm_canvas').bind('mousedown', $scope.clickDown);
+	$('#swarm_canvas').bind('mouseup', $scope.clickUp);
 });
