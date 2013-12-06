@@ -1,11 +1,74 @@
 /*global $:false */
 'use strict';
 
+
+var swarms = {};
+
+swarms.particle = function(x, y){
+	this.x = x - 5 + Math.floor(Math.random() * 5);
+	this.y = y - 5 + Math.floor(Math.random() * 5);
+	this.vx = -2 + Math.floor(Math.random() * 2);
+	this.vy = -2 + Math.floor(Math.random() * 2);
+	this.maxVel = 2;
+	this.linearity = 0.2;
+	this.drawSize = 3;
+};
+
+swarms.particle.prototype.move = function(gx, gy){
+	this.vx += this.linearity * Math.random() * Math.max(Math.min(gx - this.x, 1), -1);
+	this.vy += this.linearity * Math.random() * Math.max(Math.min(gy - this.y, 1), -1);
+	this.vx = Math.max(Math.min(this.vx, this.maxVel), -this.maxVel);
+	this.vy = Math.max(Math.min(this.vy, this.maxVel), -this.maxVel);
+	this.x += this.vx;
+	this.y += this.vy;
+	this.draw(this.x, this.y);
+};
+
+swarms.particle.prototype.draw = function(x, y){
+	var c = document.getElementById('swarm_canvas');
+	var ctx = c.getContext('2d');
+	ctx.beginPath();
+	ctx.arc(x, y, 1, 0, 2 * Math.PI, false);
+	ctx.fillStyle = 'green';
+	ctx.fill();
+};
+
+swarms.swarm = function(startX, startY){
+	this.numParticles = 20;
+	this.particles = [];
+	this.maxVel = 2;
+
+	this.x = startX;
+	this.y = startY;
+	this.vx =  -4 + Math.floor(Math.random() * 4);
+	this.vy =  -4 + Math.floor(Math.random() * 4);
+
+	for (var i=0; i<this.numParticles; i++){
+		this.particles.push(new swarms.particle(this.x,this.y));
+		this.particles[i].move(this.x,this.y);
+	}
+};
+
+swarms.swarm.prototype.move = function(x, y){
+	this.x = x;
+	this.y = y;
+	this.vx += -1 + Math.floor(Math.random());
+	this.vy += -1 + Math.floor(Math.random());
+	this.vx += Math.max(Math.min(this.vx, this.maxVel), -this.maxVel);
+	this.vy += Math.max(Math.min(this.vy, this.maxVel), -this.maxVel);
+
+	for (var i=0; i < this.particles.length; i++){
+		this.particles[i].move(x, y);
+	}
+};
+
 angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.mouse = {};
 	$scope.mouse.mouseCapture = false;
 	$scope.mouse.lastX = 0;
 	$scope.mouse.lastY = 0;
+	$scope.swarms = [];
+	$scope.animationTimer = null;
 
 	$scope.setDimentions = function(){
 		var newHeight = document.documentElement.clientHeight;
@@ -24,20 +87,8 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$( window ).resize($scope.setDimentions);
 
 	$scope.move = function(e){
-		var x = e.offsetX;
-		var y = e.offsetY;
-		$scope.mouse.mouseX = x;
-		$scope.mouse.mouseY = y;
-		if ($scope.mouse.mouseCapture){
-		  var c = document.getElementById('swarm_canvas');
-		  var ctx = c.getContext('2d');
-		  ctx.beginPath();
-		  ctx.moveTo($scope.mouse.lastX,$scope.mouse.lastY);
-		  ctx.lineTo(x,y);
-		  ctx.stroke();
-		}
-		$scope.mouse.lastX = x;
-		$scope.mouse.lastY = y;
+		$scope.mouse.lastX = e.offsetX;
+		$scope.mouse.lastY = e.offsetY;
 		$scope.$apply();
 	};
 
@@ -45,6 +96,16 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		e.preventDefault();
 		$scope.mouse.mouseCapture = true;
 		$scope.mouse.mouseBtn = e.button;
+		$scope.swarms.push(new swarms.swarm($scope.mouse.lastX, $scope.mouse.lastY));
+		var moveSwarms = function(){
+			for (var i = 0; i < $scope.swarms.length; i++){
+				$scope.swarms[i].move($scope.mouse.lastX,$scope.mouse.lastY);
+			}
+			setTimeout(moveSwarms, 16);
+		};
+		if ($scope.animationTimer === null){
+			$scope.animationTimer = setTimeout(moveSwarms, 16);
+		}
 		$scope.$apply();
 	};
 
@@ -58,26 +119,5 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$('#swarm_canvas').bind('mousemove', $scope.move);
 	$('#swarm_canvas').bind('mousedown', $scope.clickDown);
 	$('#swarm_canvas').bind('mouseup', $scope.clickUp);
-
-	$scope.particle = function(x, y){
-		this.x = x - 5 + Math.floor(Math.random() * 5);
-		this.y = y - 5 + Math.floor(Math.random() * 5);
-		this.vx = -2 + Math.floor(Math.random() * 2);
-		this.vy = -2 + Math.floor(Math.random() * 2);
-		this.maxVel = 2;
-		this.linearity = 0.2;
-		this.drawSize = 3;
-	};
-
-	$scope.particle.move = function(gx, gy){
-		this.vx += this.linearity * Math.random() * Math.max(Math.min(gx - this.x, 1), -1);
-		this.vy += this.linearity * Math.random() * Math.max(Math.min(gy - this.y, 1), -1);
-		this.vx = Math.max(Math.min(this.vx, this.maxVel), -this.maxVel);
-		this.vy = Math.max(Math.min(this.vy, this.maxVel), -this.maxVel);
-		this.x += this.vx;
-		this.y += this.vy;
-
-	};
-
-	$scope.swarm = [];
+	
 });
