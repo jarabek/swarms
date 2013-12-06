@@ -58,4 +58,26 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$('#swarm_canvas').bind('mousemove', $scope.move);
 	$('#swarm_canvas').bind('mousedown', $scope.clickDown);
 	$('#swarm_canvas').bind('mouseup', $scope.clickUp);
+
+	$scope.particle = function(x, y){
+		this.x = x - 5 + Math.floor(Math.random() * 5);
+		this.y = y - 5 + Math.floor(Math.random() * 5);
+		this.vx = -2 + Math.floor(Math.random() * 2);
+		this.vy = -2 + Math.floor(Math.random() * 2);
+		this.maxVel = 2;
+		this.linearity = 0.2;
+		this.drawSize = 3;
+	};
+
+	$scope.particle.move = function(gx, gy){
+		this.vx += this.linearity * Math.random() * Math.max(Math.min(gx - this.x, 1), -1);
+		this.vy += this.linearity * Math.random() * Math.max(Math.min(gy - this.y, 1), -1);
+		this.vx = Math.max(Math.min(this.vx, this.maxVel), -this.maxVel);
+		this.vy = Math.max(Math.min(this.vy, this.maxVel), -this.maxVel);
+		this.x += this.vx;
+		this.y += this.vy;
+
+	};
+
+	$scope.swarm = [];
 });
