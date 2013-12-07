@@ -29,7 +29,8 @@ swarms.particle.prototype.draw = function(x, y){
 	var ctx = c.getContext('2d');
 	ctx.beginPath();
 	ctx.arc(x, y, 1, 0, 2 * Math.PI, false);
-	ctx.fillStyle = 'green';
+	var c = $('#color_select').spectrum('get').toHexString();
+	ctx.fillStyle = c;
 	ctx.fill();
 };
 
@@ -69,6 +70,11 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.mouse.lastY = 0;
 	$scope.swarms = [];
 	$scope.animationTimer = null;
+
+	$('#color_select').spectrum({
+		flat: true,
+		showInput: true
+	});
 
 	$scope.setDimentions = function(){
 		var newHeight = document.documentElement.clientHeight;
