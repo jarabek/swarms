@@ -10,7 +10,7 @@ swarms.particle = function(x, y){
 	this.vx = -2 + Math.floor(Math.random() * 2);
 	this.vy = -2 + Math.floor(Math.random() * 2);
 	this.maxVel = 2;
-	this.linearity = 0.2;
+	this.linearity = 0.1;
 	this.drawSize = 3;
 };
 
@@ -29,8 +29,8 @@ swarms.particle.prototype.draw = function(x, y){
 	var ctx = c.getContext('2d');
 	ctx.beginPath();
 	ctx.arc(x, y, 1, 0, 2 * Math.PI, false);
-	var c = $('#color_select').spectrum('get').toHexString();
-	ctx.fillStyle = c;
+	var color = $('#color_select').spectrum('get').toHexString();
+	ctx.fillStyle = color;
 	ctx.fill();
 };
 
@@ -73,7 +73,8 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 
 	$('#color_select').spectrum({
 		flat: true,
-		showInput: true
+		showButtons: false,
+		preferredFormat: 'hex'
 	});
 
 	$scope.setDimentions = function(){
@@ -104,8 +105,10 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		$scope.mouse.mouseBtn = e.button;
 		$scope.swarms.push(new swarms.swarm($scope.mouse.lastX, $scope.mouse.lastY));
 		var moveSwarms = function(){
-			for (var i = 0; i < $scope.swarms.length; i++){
-				$scope.swarms[i].move($scope.mouse.lastX,$scope.mouse.lastY);
+			if ($scope.mouse.mouseCapture){
+				for (var i = 0; i < $scope.swarms.length; i++){
+					$scope.swarms[i].move($scope.mouse.lastX,$scope.mouse.lastY);
+				}
 			}
 			setTimeout(moveSwarms, 16);
 		};
