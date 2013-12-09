@@ -1,8 +1,18 @@
  <div class="sidebar" ng-controller="SwarmsController">
-  {{mouse.mouseBtn}}<br/>
-  <input type='text' id="color_select" />
+  
 
-  <div id="spread_slider"></div>
+Swarm Spread: <div ng-model="swarmSpread" id="swarm_spread_slider"></div>{{swarmSpread}}
+<hr/>
+
+Particle Draw Size: <div ng-model="particleDrawSize" id="particle_draw_size_slider"></div>{{particleDrawSize}}
+<hr/>
+
+Particle Count: <div ng-model="particleCount" id="particle_count_slider"></div>{{particleCount}}
+<hr/>
+
+Particle Max Velocity: <div ng-model="particleMaxVelocity" id="particle_max_velocity"></div>{{particleMaxVelocity}}
+<hr/>
+  <input type='text' id="color_select" />
 
 </div>
 <div class="content">

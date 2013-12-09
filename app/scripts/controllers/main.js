@@ -4,19 +4,19 @@
 
 var swarms = {};
 
-swarms.particle = function(x, y){
-	this.x = x - 5 + Math.floor(Math.random() * 5);
-	this.y = y - 5 + Math.floor(Math.random() * 5);
-	this.vx = -2 + Math.floor(Math.random() * 2);
-	this.vy = -2 + Math.floor(Math.random() * 2);
-	this.maxVel = 2;
-	this.linearity = 0.1;
-	this.drawSize = 3;
+swarms.particle = function(x, y, swarmSpread, particleDrawSize, particleMaxVelocity){
+	this.x = x - 50 + Math.floor(Math.random() * 50);
+	this.y = y - 50 + Math.floor(Math.random() * 50);
+	this.vx = -particleMaxVelocity + Math.floor(Math.random() * particleMaxVelocity);
+	this.vy = -particleMaxVelocity + Math.floor(Math.random() * particleMaxVelocity);
+	this.maxVel = particleMaxVelocity;
+	this.swarmSpread = swarmSpread;
+	this.drawSize = particleDrawSize;
 };
 
-swarms.particle.prototype.move = function(gx, gy){
-	this.vx += this.linearity * Math.random() * Math.max(Math.min(gx - this.x, 1), -1);
-	this.vy += this.linearity * Math.random() * Math.max(Math.min(gy - this.y, 1), -1);
+swarms.particle.prototype.move = function(x, y){
+	this.vx += this.swarmSpread * Math.random() * Math.max(Math.min(x - this.x, 1), -1);
+	this.vy += this.swarmSpread * Math.random() * Math.max(Math.min(y - this.y, 1), -1);
 	this.vx = Math.max(Math.min(this.vx, this.maxVel), -this.maxVel);
 	this.vy = Math.max(Math.min(this.vy, this.maxVel), -this.maxVel);
 	this.x += this.vx;
@@ -28,36 +28,22 @@ swarms.particle.prototype.draw = function(x, y){
 	var c = document.getElementById('swarm_canvas');
 	var ctx = c.getContext('2d');
 	ctx.beginPath();
-	ctx.arc(x, y, 1, 0, 2 * Math.PI, false);
-	var color = $('#color_select').spectrum('get').toHexString();
+	ctx.arc(x, y, (this.drawSize/2), 0, 2 * Math.PI, false);
+	var color = $('#color_select').spectrum('get').toRgbString();
 	ctx.fillStyle = color;
 	ctx.fill();
 };
 
-swarms.swarm = function(startX, startY){
-	this.numParticles = 20;
+swarms.swarm = function(startX, startY, swarmSpread, particleDrawSize, numParticles, particleMaxVelocity){
+	this.numParticles = numParticles;
 	this.particles = [];
-	this.maxVel = 2;
-
-	this.x = startX;
-	this.y = startY;
-	this.vx =  -4 + Math.floor(Math.random() * 4);
-	this.vy =  -4 + Math.floor(Math.random() * 4);
-
 	for (var i=0; i<this.numParticles; i++){
-		this.particles.push(new swarms.particle(this.x,this.y));
-		this.particles[i].move(this.x,this.y);
+		this.particles.push(new swarms.particle(startX, startY, swarmSpread, particleDrawSize, particleMaxVelocity));
+		this.particles[i].move(startX, startY);
 	}
 };
 
 swarms.swarm.prototype.move = function(x, y){
-	this.x = x;
-	this.y = y;
-	this.vx += -1 + Math.floor(Math.random());
-	this.vy += -1 + Math.floor(Math.random());
-	this.vx += Math.max(Math.min(this.vx, this.maxVel), -this.maxVel);
-	this.vy += Math.max(Math.min(this.vy, this.maxVel), -this.maxVel);
-
 	for (var i=0; i < this.particles.length; i++){
 		this.particles[i].move(x, y);
 	}
@@ -70,13 +56,64 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.mouse.lastY = 0;
 	$scope.swarms = [];
 	$scope.animationTimer = null;
+	$scope.swarmSpread = 0.1;
+	$scope.particleDrawSize = 3;
+	$scope.particleCount = 10;
+	$scope.particleMaxVelocity = 2;
 
-	$('#spread_slider').slider({});
+
+	$('#particle_max_velocity').slider({
+		min: 1,
+		animate: true,
+		max: 10,
+		step: 1,
+		value: $scope.particleMaxVelocity,
+		slide: function (event, ui) {
+			$scope.particleMaxVelocity = ui.value;
+			$scope.$apply();
+		}
+	});
+
+	$('#particle_count_slider').slider({
+		min: 1,
+		animate: true,
+		max: 100,
+		step: 1,
+		value: $scope.particleCount,
+		slide: function (event, ui) {
+			$scope.particleCount = ui.value;
+			$scope.$apply();
+		}
+	});
+
+	$('#particle_draw_size_slider').slider({
+		min: 1,
+		animate: true,
+		max: 15,
+		step: 1,
+		value: $scope.particleDrawSize,
+		slide: function (event, ui) {
+			$scope.particleDrawSize = ui.value;
+			$scope.$apply();
+		}
+	});
+
+	$('#swarm_spread_slider').slider({
+		min: 0.01,
+		animate: true,
+		max: 1,
+		step: 0.01,
+		value: $scope.swarmSpread,
+		slide: function (event, ui) {
+			$scope.swarmSpread = ui.value;
+			$scope.$apply();
+		}
+	});
 
 	$('#color_select').spectrum({
 		flat: true,
 		showButtons: false,
-		preferredFormat: 'hex'
+		showAlpha: true
 	});
 
 	$scope.setDimentions = function(){
@@ -105,7 +142,14 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		e.preventDefault();
 		$scope.mouse.mouseCapture = true;
 		$scope.mouse.mouseBtn = e.button;
-		$scope.swarms.push(new swarms.swarm($scope.mouse.lastX, $scope.mouse.lastY));
+		if ($scope.swarms.length === 0){
+			$scope.swarms.push(new swarms.swarm($scope.mouse.lastX,
+												$scope.mouse.lastY,
+												$scope.swarmSpread,
+												$scope.particleDrawSize,
+												$scope.particleCount,
+												$scope.particleMaxVelocity));
+		}
 		var moveSwarms = function(){
 			if ($scope.mouse.mouseCapture){
 				for (var i = 0; i < $scope.swarms.length; i++){
