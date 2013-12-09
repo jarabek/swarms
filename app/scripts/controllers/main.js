@@ -71,6 +71,8 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.swarms = [];
 	$scope.animationTimer = null;
 
+	$('#spread_slider').slider({});
+
 	$('#color_select').spectrum({
 		flat: true,
 		showButtons: false,
