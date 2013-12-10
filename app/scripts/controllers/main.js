@@ -116,11 +116,17 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		showAlpha: true
 	});
 
+	$scope.toggleMenu = function(){
+		$('.sidebar').toggle('slide');
+	};
+
 	$scope.setDimentions = function(){
 		var newHeight = document.documentElement.clientHeight;
 		$('.content').height(newHeight);
 		$('.sidebar').height(newHeight);
+		$('.divider').height(newHeight);
 		$('.container').height(newHeight);
+
 		$('#swarm_canvas').height(newHeight);
 		$('#swarm_canvas')[0].height = newHeight;
 		 
