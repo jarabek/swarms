@@ -60,6 +60,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.particleDrawSize = 3;
 	$scope.particleCount = 10;
 	$scope.particleMaxVelocity = 2;
+	$scope.menuOpen = true;
 
 
 	$('#particle_max_velocity').slider({
@@ -117,12 +118,20 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	});
 
 	$scope.toggleMenu = function(){
-		$('.sidebar').toggle('slide');
+		var w = $('.sidebarContent').width();
+		w = -w;
+		if ($scope.menu){
+			$('.sidebar').animate({left:'0px'});
+		}else{
+			$('.sidebar').animate({left: w + 'px'});
+		}
+		$scope.menu = !$scope.menu;
 	};
 
 	$scope.setDimentions = function(){
 		var newHeight = document.documentElement.clientHeight;
 		$('.content').height(newHeight);
+		$('.sidebarContent').height(newHeight);
 		$('.sidebar').height(newHeight);
 		$('.divider').height(newHeight);
 		$('.container').height(newHeight);
@@ -145,7 +154,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	};
 
 	$scope.clickDown = function(e){
-		e.preventDefault();
+		//e.preventDefault();
 		$scope.mouse.mouseCapture = true;
 		$scope.mouse.mouseBtn = e.button;
 		if ($scope.swarms.length === 0){
