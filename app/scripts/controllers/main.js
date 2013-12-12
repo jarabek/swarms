@@ -62,7 +62,6 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.particleMaxVelocity = 2;
 	$scope.menuOpen = true;
 
-
 	$('#particle_max_velocity').slider({
 		min: 1,
 		animate: true,
@@ -154,7 +153,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	};
 
 	$scope.clickDown = function(e){
-		//e.preventDefault();
+		e.preventDefault();
 		$scope.mouse.mouseCapture = true;
 		$scope.mouse.mouseBtn = e.button;
 		if ($scope.swarms.length === 0){
