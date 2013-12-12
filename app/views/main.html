@@ -2,19 +2,26 @@
  	<div class="sidebarContent">
 		<ul class="list-group">
 			<li class="list-group-item">
-				Swarm Spread: <div ng-model="swarmSpread" class="slider" id="swarm_spread_slider"></div>{{swarmSpread}}
+				<strong>Swarm Spread: {{swarmSpread}}</strong>
+				<div ng-model="swarmSpread" class="slider" id="swarm_spread_slider"></div>
 			</li>
 			<li class="list-group-item">
-				Particle Draw Size: <div ng-model="particleDrawSize" class="slider" id="particle_draw_size_slider"></div>{{particleDrawSize}}
+				<strong>Particle Draw Size: {{particleDrawSize}}</strong>
+				<div ng-model="particleDrawSize" class="slider" id="particle_draw_size_slider"></div>
 			</li>
 			<li class="list-group-item">
-				  Particle Count: <div ng-model="particleCount" class="slider" id="particle_count_slider"></div>{{particleCount}}
+				 <strong>Particle Count: {{particleCount}}</strong>
+				 <div ng-model="particleCount" class="slider" id="particle_count_slider"></div>
 			</li>
 		  	<li class="list-group-item">
-		  		Particle Max Velocity: <div ng-model="particleMaxVelocity" class="slider" id="particle_max_velocity"></div>{{particleMaxVelocity}}
+		  		<strong>Particle Max Velocity: {{particleMaxVelocity}}</strong>
+		  		<div ng-model="particleMaxVelocity" class="slider" id="particle_max_velocity"></div>
 		  	</li>
-		</ul>
-	  <input type='text' id="color_select" />
+		  	<li class="list-group-item">
+		  		<strong>Particle Colour:</strong>
+		  		<input type='text' id="color_select" />
+		  	</li>
+		</ul>	  		
 	</div>
   	<div class="divider" ng-click="toggleMenu()"></div>
 </div>
