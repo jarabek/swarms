@@ -30,7 +30,9 @@
 }
 
 .list-group-item{
-    background-color:#aaaaaa;    
+    background-color:#555555;  
+    border: 0px;  
+    color: #dddddd;
 }
 
 .slider{
@@ -43,7 +45,7 @@
     height:500px;
     position: relative;
     float:left;
-    background-color:#aaaaaa;
+    background-color:#555555;
     z-index:5;
 }
 
@@ -66,7 +68,12 @@
     height:500px;
     width:500px;    
     z-index: 2;
+}
 
+.sp-container
+{
+    background-color:#dddddd;
+    border: 0px;
 }
 
 .sp-picker-container{
