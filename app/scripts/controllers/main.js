@@ -54,6 +54,8 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.mouse.mouseCapture = false;
 	$scope.mouse.lastX = 0;
 	$scope.mouse.lastY = 0;
+	$scope.touch.touchCapture = false;
+
 	$scope.swarms = [];
 	$scope.animationTimer = null;
 	$scope.swarmSpread = 0.1;
@@ -152,10 +154,18 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		$scope.$apply();
 	};
 
+	$scope.moveSwarms = function(lastX, lastY){
+		if ($scope.mouse.mouseCapture || $scope.touch.touchCapture){
+			for (var i = 0; i < $scope.swarms.length; i++){
+				$scope.swarms[i].move(lastX, lastY);
+			}
+		}
+		setTimeout($scope.moveSwarms, 16);
+	};
+
 	$scope.clickDown = function(e){
 		e.preventDefault();
 		$scope.mouse.mouseCapture = true;
-		$scope.mouse.mouseBtn = e.button;
 		if ($scope.swarms.length === 0){
 			$scope.swarms.push(new swarms.swarm($scope.mouse.lastX,
 												$scope.mouse.lastY,
@@ -164,16 +174,9 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 												$scope.particleCount,
 												$scope.particleMaxVelocity));
 		}
-		var moveSwarms = function(){
-			if ($scope.mouse.mouseCapture){
-				for (var i = 0; i < $scope.swarms.length; i++){
-					$scope.swarms[i].move($scope.mouse.lastX,$scope.mouse.lastY);
-				}
-			}
-			setTimeout(moveSwarms, 16);
-		};
+		$scope.moveSwarms($scope.mouse.lastX, $scope.mouse.lastY);
 		if ($scope.animationTimer === null){
-			$scope.animationTimer = setTimeout(moveSwarms, 16);
+			$scope.animationTimer = setTimeout($scope.moveSwarms, 16);
 		}
 		$scope.$apply();
 	};
@@ -181,12 +184,37 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.clickUp = function(e){
 		e.preventDefault();
 		$scope.mouse.mouseCapture = false;
-		$scope.mouse.mouseBtn = 'None';
+		$scope.$apply();
+	};
+
+	$scope.drag = function(e){
+		e.preventDefault();
+		var touches = e.gesture.touches;
+		$scope.touch.touchCapture = true;
+
+		if ($scope.swarms.length <= touches.length){
+			$scope.swarms.push(new swarms.swarm($scope.mouse.lastX,
+									$scope.mouse.lastY,
+									$scope.swarmSpread,
+									$scope.particleDrawSize,
+									$scope.particleCount,
+									$scope.particleMaxVelocity));
+		}
+		
+
+
+		window.console.log(e);
+	};
+
+	$scope.dragEnd = function(e){
+		e.preventDefault();
+		$scope.touch.touchCapture = false;
 		$scope.$apply();
 	};
 
 	$('#swarm_canvas').bind('mousemove', $scope.move);
 	$('#swarm_canvas').bind('mousedown', $scope.clickDown);
 	$('#swarm_canvas').bind('mouseup', $scope.clickUp);
-	
+	$('#swarm_canvas').hammer().on('drag', $scope.drag);
+	$('#swarm_canvas').hammer().on('dragend', $scope.dragEnd);
 });
