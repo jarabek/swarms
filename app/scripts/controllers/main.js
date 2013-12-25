@@ -61,7 +61,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	
 	$scope.inputs = {};
 	$scope.inputs.inputCapture = false;
-	$scope.inputs.lastCoords = [];
+	$scope.inputs.coordinates = [];
 	$scope.swarms = [];
 		
 	//Model vars for UI sliders
@@ -160,12 +160,22 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		return ret;
 	};
 
-	$scope.move = function(e){
-		if (e.type === 'mousemove'){
-			$scope.inputs.lastCoords[0] = {X: e.offsetX, Y: e.offsetY, inUse: false};
-		}else{
-			window.console.log(e);
+	$scope.inputMove = function(e){
+		$scope.inputs.coordinates = [];
+		if ((e.type === 'mousemove') || (e.type === 'mousedown')) {
+			$scope.inputs.coordiantes[0] = {X: e.offsetX, Y: e.offsetY, inUse: false};
+		}else if ((e.type === 'touchmove') || (e.type === 'touchstart')) {
+			var touches = [];
+			if (e.type === 'touchstart'){
+				touches = e.originalEvent.changedTouches;
+			} else if (e.type === 'touchmove'){
+				touches = e.originalEvent.touches;
+			}
+			for (var i = 0; i < touches.length; i++){
+				$scope.inputs.coordinates.push({X: touches[i].clientX, Y: touches[i].clientY, inUse: false});
+			}
 		}
+		window.console.log('#inputs: ', $scope.inputs.coordinates.length);
 		$scope.$apply();
 	};
 
@@ -174,61 +184,61 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 			for (var i = 0; i < $scope.swarms.length; i++){
 				var minIdx = -1;
 				var minDistance = 9000;
-				for (var j = 0; j < $scope.inputs.lastCoords.length; j++){
-					var distance = $scope.getDistance($scope.inputs.lastCoords[j].X,
-													  $scope.inputs.lastCoords[j].Y,
-													  $scope.swarms[i].getLocation().X,
-													  $scope.swarms[i].getLocation().Y);
-					if (distance < minDistance){
-						minDistance = distance;
-						minIdx = j;
+				for (var j = 0; j < $scope.inputs.coordinates.length; j++){
+					if (!$scope.inputs.coordinates[j].inUse){
+						var distance = $scope.getDistance($scope.inputs.coordinates[j].X,
+														  $scope.inputs.coordinates[j].Y,
+														  $scope.swarms[i].getLocation().X,
+														  $scope.swarms[i].getLocation().Y);
+						if (distance < minDistance){
+							minDistance = distance;
+							minIdx = j;
+						}
 					}
 				}
-				$scope.swarms[i].move($scope.inputs.lastCoords[minIdx].X, $scope.inputs.lastCoords[minIdx].Y);
+				if (minIdx >= 0){
+					$scope.swarms[i].move($scope.inputs.coordinates[minIdx].X, $scope.inputs.coordinates[minIdx].Y);
+					$scope.inputs.coordinates[minIdx].inUse = true;
+				}
 			}
 		}
 		setTimeout($scope.moveSwarms, 16);
 	};
 
-	$scope.clickDown = function(e){
+	$scope.inputStart = function(e){
 		e.preventDefault();
+		$scope.inputMove(e);
+
 		$scope.inputs.inputCapture = true;
-		if ($scope.swarms.length === 0){
-			$scope.swarms.push(new swarms.swarm($scope.inputs.lastCoords[0].X,
-												$scope.inputs.lastCoords[0].Y,
+		
+		for (var i = $scope.swarms.length; i < $scope.inputs.coordinates.length; i++){
+			$scope.swarms.push(new swarms.swarm($scope.inputs.coordinates[i].X,
+												$scope.inputs.coordinates[i].Y,
 												$scope.swarmSpread,
 												$scope.particleDrawSize,
 												$scope.particleCount,
 												$scope.particleMaxVelocity));
-			$scope.moveSwarms($scope.inputs.lastCoords[0].X, $scope.inputs.lastCoords[0].Y);
+			$scope.moveSwarms();
 		}
-
+				
 		if ($scope.animationTimer === null){
 			$scope.animationTimer = setTimeout($scope.moveSwarms, 16);
 		}
 		$scope.$apply();
 	};
 
-	$scope.clickUp = function(e){
+	$scope.inputEnd = function(e){
 		e.preventDefault();
 		$scope.inputs.inputCapture = false;
 		$scope.$apply();
 	};
 
-	$scope.drag = function(e){
+	$('#swarm_canvas').bind('mousemove', $scope.inputMove);
+	$('#swarm_canvas').bind('mousedown', $scope.inputStart);
+	$('#swarm_canvas').bind('mouseup', $scope.inputEnd);
+	$('#swarm_canvas').bind('touchmove', $scope.inputMove);
+	$('#swarm_canvas').bind('touchstart', $scope.inputStart);
+	$('#swarm_canvas').bind('touchend', $scope.inputEnd);
 
-		
 
-		window.console.log(e);
-	};
-
-	$scope.dragEnd = function(e){
-		e.preventDefault();
-		$scope.inputs.inputCapture = false;
-		$scope.$apply();
-	};
-
-	$('#swarm_canvas').bind('mousemove', $scope.move);
-	$('#swarm_canvas').bind('mousedown', $scope.clickDown);
-	$('#swarm_canvas').bind('mouseup', $scope.clickUp);
 });
