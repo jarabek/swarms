@@ -1,49 +1,66 @@
 /*global $:false */
 'use strict';
 
-
 var swarms = {};
 
+//The basic element of a swarm
 swarms.particle = function(x, y, swarmSpread, particleDrawSize, particleMaxVelocity){
+	//Initialize the swarm so that it is spread out.
 	this.x = x - 50 + Math.floor(Math.random() * 50);
 	this.y = y - 50 + Math.floor(Math.random() * 50);
+
+	//Give each particle a varied velocity
 	this.vx = -particleMaxVelocity + Math.floor(Math.random() * particleMaxVelocity);
 	this.vy = -particleMaxVelocity + Math.floor(Math.random() * particleMaxVelocity);
+
 	this.maxVel = particleMaxVelocity;
 	this.swarmSpread = swarmSpread;
 	this.drawSize = particleDrawSize;
 };
 
+//Move a particle to the given coordinates
 swarms.particle.prototype.move = function(x, y){
+	//Calculate the new x y based on the current new coordinates and the existing velocity
 	this.vx += this.swarmSpread * Math.random() * Math.max(Math.min(x - this.x, 1), -1);
 	this.vy += this.swarmSpread * Math.random() * Math.max(Math.min(y - this.y, 1), -1);
 	this.vx = Math.max(Math.min(this.vx, this.maxVel), -this.maxVel);
 	this.vy = Math.max(Math.min(this.vy, this.maxVel), -this.maxVel);
 	this.x += this.vx;
 	this.y += this.vy;
+
 	this.draw(this.x, this.y);
 };
 
+//Draw a particle at the given coordinates
 swarms.particle.prototype.draw = function(x, y){
+	//Get the drawing object
 	var c = document.getElementById('swarm_canvas');
 	var ctx = c.getContext('2d');
+
+	//Draw a simple circle
 	ctx.beginPath();
 	ctx.arc(x, y, (this.drawSize/2), 0, 2 * Math.PI, false);
+
+	//Get the color from the color picker and fill the shape with that color
 	var color = $('#color_select').spectrum('get').toRgbString();
 	ctx.fillStyle = color;
 	ctx.fill();
 };
 
+//Constructor for a swarm
+//Takes a starting location, and the various properties derived from the sliders in the UI
 swarms.swarm = function(startX, startY, swarmSpread, particleDrawSize, numParticles, particleMaxVelocity){
 	this.numParticles = numParticles;
 	this.location = {X: startX, Y: startY};
 	this.particles = [];
+	//Add particles to the swarm
 	for (var i=0; i<this.numParticles; i++){
 		this.particles.push(new swarms.particle(startX, startY, swarmSpread, particleDrawSize, particleMaxVelocity));
 		this.particles[i].move(startX, startY);
 	}
 };
 
+//For moving an entire swarm
 swarms.swarm.prototype.move = function(x, y){
 	this.location = {X: x, Y: y};
 	for (var i=0; i < this.particles.length; i++){
@@ -51,17 +68,27 @@ swarms.swarm.prototype.move = function(x, y){
 	}
 };
 
+//Returns the current location of the swarm as an object literal: {x,y}
 swarms.swarm.prototype.getLocation = function(){
 	return this.location;
 };
 
+//Angular controller for the drawing page
 angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
+	//Is the side menu open?
 	$scope.menuOpen = true;
+
+	//Used for keeping track of the timer for animating
 	$scope.animationTimer = null;
 	
+	//Stores current input state
 	$scope.inputs = {};
+	//Are we currently capturing input?
 	$scope.inputs.inputCapture = false;
+	//List of all active input coordinates (contains all x,y for every finger interacting on a tablet)
 	$scope.inputs.coordinates = [];
+
+	//My list of swarms
 	$scope.swarms = [];
 		
 	//Model vars for UI sliders
@@ -70,6 +97,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.particleCount = 10;
 	$scope.particleMaxVelocity = 2;
 	
+	//Setup all the sliders and bind them to the scope vars above
 	$('#particle_max_velocity').slider({
 		min: 1,
 		animate: true,
@@ -118,12 +146,14 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		}
 	});
 
+	//Initialize the color selector widget
 	$('#color_select').spectrum({
 		flat: true,
 		showButtons: false,
 		showAlpha: true
 	});
 
+	//Show or hide the side menu
 	$scope.toggleMenu = function(){
 		var w = $('.sidebarContent').width();
 		w = -w;
@@ -135,7 +165,8 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		$scope.menu = !$scope.menu;
 	};
 
-	$scope.setDimentions = function(){
+	//Resets the dimentions of the various page elements when the window is resized
+	$scope.resetDimentions = function(){
 		var newHeight = document.documentElement.clientHeight;
 		$('.content').height(newHeight);
 		$('.sidebarContent').height(newHeight);
@@ -151,15 +182,17 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		$('#swarm_canvas')[0].width = newWidth;
 	};
 
-	$( document ).ready($scope.setDimentions);
-	$( window ).resize($scope.setDimentions);
+	//Bind the window resize event to the method above
+	$( window ).resize($scope.resetDimentions);
 
+	//Calculates the euclidian distance between two points
 	$scope.getDistance = function(x1,y1,x2,y2){
 		var d = ((x1 - x2) * (x1 - x2)) + ((y1 - y2) * (y1 - y2));
 		var ret = Math.sqrt(d);
 		return ret;
 	};
 
+	//Move all the swarms 
 	$scope.moveSwarms = function(){
 		if ($scope.inputs.inputCapture){
 			for (var i = 0; i < $scope.swarms.length; i++){
@@ -186,13 +219,15 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		setTimeout($scope.moveSwarms, 16);
 	};
 
+	//Handler for touchstart / mouse start events
 	$scope.inputStart = function(e){
 		e.preventDefault();
-		$scope.updateCoordinates(e);
 
+		//Get the new coordinates for teh input
+		$scope.updateCoordinates(e);
 		$scope.inputs.inputCapture = true;
 
-		window.console.log('inputStart', $scope.swarms.length, $scope.inputs.coordinates.length);
+		//Add swarms to match the number of inputs (i.e. fingers)
 		for (var i = $scope.swarms.length; i < $scope.inputs.coordinates.length; i++){
 			$scope.swarms.push(new swarms.swarm($scope.inputs.coordinates[i].X,
 												$scope.inputs.coordinates[i].Y,
@@ -202,18 +237,21 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 												$scope.particleMaxVelocity));
 			$scope.moveSwarms();
 		}
-				
+
+		//Set the animation timer running				
 		if ($scope.animationTimer === null){
 			$scope.animationTimer = setTimeout($scope.moveSwarms, 16);
 		}
 		$scope.$apply();
 	};
 
+	//Takes an input event and updates the list of active input coordinates
 	$scope.updateCoordinates = function(e){
-		window.console.log('updatingCoordinates');
 		$scope.inputs.coordinates = [];
+		//If this is a mouse event...
 		if ((e.type === 'mousemove') || (e.type === 'mousedown')) {
 			$scope.inputs.coordiantes[0] = {X: e.offsetX, Y: e.offsetY, inUse: false};
+		//Or if this is a touch event....
 		}else if ((e.type === 'touchmove') || (e.type === 'touchstart')) {
 			var touches = e.originalEvent.touches;
 			for (var i = 0; i < touches.length; i++){
@@ -223,13 +261,16 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		$scope.$apply();
 	};
 
+	//Fires when an input ceases
 	$scope.inputEnd = function(e){
-		window.console.log('inputEnd');
 		e.preventDefault();
-		$scope.inputs.inputCapture = false;
-		$scope.$apply();
+		if (e.originalEvent.touches.length === 0){
+			$scope.inputs.inputCapture = false;
+			$scope.$apply();
+		}
 	};
 
+	//Bind all the input events to their appropriate handlers
 	$('#swarm_canvas').bind('mousemove', $scope.updateCoordinates);
 	$('#swarm_canvas').bind('mousedown', $scope.inputStart);
 	$('#swarm_canvas').bind('mouseup', $scope.inputEnd);
@@ -237,5 +278,6 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$('#swarm_canvas').bind('touchstart', $scope.inputStart);
 	$('#swarm_canvas').bind('touchend', $scope.inputEnd);
 
-
+	//Resize the document elements when the page is ready
+	$( document ).ready($scope.resetDimentions);
 });
