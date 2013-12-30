@@ -160,25 +160,6 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		return ret;
 	};
 
-	$scope.inputMove = function(e){
-		$scope.inputs.coordinates = [];
-		if ((e.type === 'mousemove') || (e.type === 'mousedown')) {
-			$scope.inputs.coordiantes[0] = {X: e.offsetX, Y: e.offsetY, inUse: false};
-		}else if ((e.type === 'touchmove') || (e.type === 'touchstart')) {
-			var touches = [];
-			if (e.type === 'touchstart'){
-				touches = e.originalEvent.changedTouches;
-			} else if (e.type === 'touchmove'){
-				touches = e.originalEvent.touches;
-			}
-			for (var i = 0; i < touches.length; i++){
-				$scope.inputs.coordinates.push({X: touches[i].clientX, Y: touches[i].clientY, inUse: false});
-			}
-		}
-		window.console.log('#inputs: ', $scope.inputs.coordinates.length);
-		$scope.$apply();
-	};
-
 	$scope.moveSwarms = function(){
 		if ($scope.inputs.inputCapture){
 			for (var i = 0; i < $scope.swarms.length; i++){
@@ -207,10 +188,11 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 
 	$scope.inputStart = function(e){
 		e.preventDefault();
-		$scope.inputMove(e);
+		$scope.updateCoordinates(e);
 
 		$scope.inputs.inputCapture = true;
-		
+
+		window.console.log('inputStart', $scope.swarms.length, $scope.inputs.coordinates.length);
 		for (var i = $scope.swarms.length; i < $scope.inputs.coordinates.length; i++){
 			$scope.swarms.push(new swarms.swarm($scope.inputs.coordinates[i].X,
 												$scope.inputs.coordinates[i].Y,
@@ -227,16 +209,31 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		$scope.$apply();
 	};
 
+	$scope.updateCoordinates = function(e){
+		window.console.log('updatingCoordinates');
+		$scope.inputs.coordinates = [];
+		if ((e.type === 'mousemove') || (e.type === 'mousedown')) {
+			$scope.inputs.coordiantes[0] = {X: e.offsetX, Y: e.offsetY, inUse: false};
+		}else if ((e.type === 'touchmove') || (e.type === 'touchstart')) {
+			var touches = e.originalEvent.touches;
+			for (var i = 0; i < touches.length; i++){
+				$scope.inputs.coordinates.push({X: touches[i].clientX, Y: touches[i].clientY, inUse: false});
+			}
+		}
+		$scope.$apply();
+	};
+
 	$scope.inputEnd = function(e){
+		window.console.log('inputEnd');
 		e.preventDefault();
 		$scope.inputs.inputCapture = false;
 		$scope.$apply();
 	};
 
-	$('#swarm_canvas').bind('mousemove', $scope.inputMove);
+	$('#swarm_canvas').bind('mousemove', $scope.updateCoordinates);
 	$('#swarm_canvas').bind('mousedown', $scope.inputStart);
 	$('#swarm_canvas').bind('mouseup', $scope.inputEnd);
-	$('#swarm_canvas').bind('touchmove', $scope.inputMove);
+	$('#swarm_canvas').bind('touchmove', $scope.updateCoordinates);
 	$('#swarm_canvas').bind('touchstart', $scope.inputStart);
 	$('#swarm_canvas').bind('touchend', $scope.inputEnd);
 
