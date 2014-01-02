@@ -153,6 +153,11 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		showAlpha: true
 	});
 
+	//Resets the drawing canvas
+	$scope.clear = function(){
+		$scope.resetDimentions();
+	};
+
 	//Show or hide the side menu
 	$scope.toggleMenu = function(){
 		var w = $('.sidebarContent').width();
@@ -192,9 +197,17 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		return ret;
 	};
 
+	$scope.resetInUse = function(){
+		for (var j = 0; j < $scope.inputs.coordinates.length; j++){
+			$scope.inputs.coordinates[j].inUse = false;
+		}
+	};
+
 	//Move all the swarms 
 	$scope.moveSwarms = function(){
 		if ($scope.inputs.inputCapture){
+			//Re-set inuse flag on each coordinate pair for a new move
+			$scope.resetInUse();
 			for (var i = 0; i < $scope.swarms.length; i++){
 				var minIdx = -1;
 				var minDistance = 9000;
@@ -250,7 +263,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 		$scope.inputs.coordinates = [];
 		//If this is a mouse event...
 		if ((e.type === 'mousemove') || (e.type === 'mousedown')) {
-			$scope.inputs.coordiantes[0] = {X: e.offsetX, Y: e.offsetY, inUse: false};
+			$scope.inputs.coordinates[0] = {X: e.offsetX, Y: e.offsetY, inUse: false};
 		//Or if this is a touch event....
 		}else if ((e.type === 'touchmove') || (e.type === 'touchstart')) {
 			var touches = e.originalEvent.touches;
@@ -264,7 +277,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	//Fires when an input ceases
 	$scope.inputEnd = function(e){
 		e.preventDefault();
-		if (e.originalEvent.touches.length === 0){
+		if ((e.type === 'mouseup') || (e.originalEvent.touches.length === 0) ){
 			$scope.inputs.inputCapture = false;
 			$scope.$apply();
 		}

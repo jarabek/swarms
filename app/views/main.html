@@ -3,24 +3,28 @@
 		<ul class="list-group">
 			<li class="list-group-item">
 				<strong>Swarm Spread: {{swarmSpread}}</strong>
-				<div ng-model="swarmSpread" class="slider" id="swarm_spread_slider"></div>
+				<div ng-model="swarmSpread" class="control" id="swarm_spread_slider"></div>
 			</li>
 			<li class="list-group-item">
 				<strong>Particle Draw Size: {{particleDrawSize}}</strong>
-				<div ng-model="particleDrawSize" class="slider" id="particle_draw_size_slider"></div>
+				<div ng-model="particleDrawSize" class="control" id="particle_draw_size_slider"></div>
 			</li>
 			<li class="list-group-item">
 				 <strong>Particle Count: {{particleCount}}</strong>
-				 <div ng-model="particleCount" class="slider" id="particle_count_slider"></div>
+				 <div ng-model="particleCount" class="control" id="particle_count_slider"></div>
 			</li>
 		  	<li class="list-group-item">
 		  		<strong>Particle Max Velocity: {{particleMaxVelocity}}</strong>
-		  		<div ng-model="particleMaxVelocity" class="slider" id="particle_max_velocity"></div>
+		  		<div ng-model="particleMaxVelocity" class="control" id="particle_max_velocity"></div>
 		  	</li>
 		  	<li class="list-group-item">
 		  		<strong>Particle Colour:</strong>
 		  		<input type='text' id="color_select" />
 		  	</li>
+		  	<li class="list-group-item">
+		  		<button type="text" class="btn btn-default control" ng-click="clear()" id="clear_button">Clear</button>
+		  	</li>
+
 		</ul>	  		
 	</div>
   	<div class="divider" ng-click="toggleMenu()"></div>
