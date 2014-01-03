@@ -156,6 +156,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	//Resets the drawing canvas
 	$scope.clear = function(){
 		$scope.resetDimentions();
+		$scope.swarms = [];
 	};
 
 	//Show or hide the side menu
@@ -282,15 +283,19 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 			$scope.$apply();
 		}
 	};
-
-	//Bind all the input events to their appropriate handlers
-	$('#swarm_canvas').bind('mousemove', $scope.updateCoordinates);
-	$('#swarm_canvas').bind('mousedown', $scope.inputStart);
-	$('#swarm_canvas').bind('mouseup', $scope.inputEnd);
-	$('#swarm_canvas').bind('touchmove', $scope.updateCoordinates);
-	$('#swarm_canvas').bind('touchstart', $scope.inputStart);
-	$('#swarm_canvas').bind('touchend', $scope.inputEnd);
-
+	
 	//Resize the document elements when the page is ready
 	$( document ).ready($scope.resetDimentions);
+});
+
+angular.module('swarmsApp').directive('drawable', function(){
+	return function(scope){
+		//Bind all the input events to their appropriate handlers
+		$('#swarm_canvas').bind('mousemove', scope.updateCoordinates);
+		$('#swarm_canvas').bind('mousedown', scope.inputStart);
+		$('#swarm_canvas').bind('mouseup', scope.inputEnd);
+		$('#swarm_canvas').bind('touchmove', scope.updateCoordinates);
+		$('#swarm_canvas').bind('touchstart', scope.inputStart);
+		$('#swarm_canvas').bind('touchend', scope.inputEnd);
+	};
 });

@@ -2,19 +2,16 @@
   "name": "swarms",
   "version": "0.0.0",
   "dependencies": {
-    "twitter": "*",
-    "hammerjs" : "*",
+    "twitter": "~3.0.3",
     "angular": "~1.2.0",
-    "json3": "~3.2.4",
-    "es5-shim": "~2.1.0",
     "jquery": "~1.10.2",
     "angular-resource": "~1.2.0",
     "angular-cookies": "~1.2.0",
     "angular-sanitize": "~1.2.0",
     "angular-route": "~1.2.0",
-    "spectrum": "*",
-    "jquery.ui": "*"
-  },
+    "spectrum": "~1.1.1",
+	"jquery.ui": "~1.10.3"
+	},
   "devDependencies": {
     "angular-mocks": "~1.2.0",
     "angular-scenario": "~1.2.0"
