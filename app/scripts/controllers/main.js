@@ -98,52 +98,44 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$scope.particleMaxVelocity = 2;
 	
 	//Setup all the sliders and bind them to the scope vars above
-	$('#particle_max_velocity').slider({
-		min: 1,
-		animate: true,
-		max: 10,
+	$('#particle_max_velocity').noUiSlider({
+		range: [1, 10],
+		start: $scope.particleMaxVelocity,
 		step: 1,
-		value: $scope.particleMaxVelocity,
-		slide: function (event, ui) {
-			$scope.particleMaxVelocity = ui.value;
-			$scope.$apply();
-		}
+		handles: 1
+	}).change(function(){
+		$scope.particleMaxVelocity = $('#particle_max_velocity').val();
+		$scope.$apply();
 	});
 
-	$('#particle_count_slider').slider({
-		min: 1,
-		animate: true,
-		max: 100,
+	$('#particle_count_slider').noUiSlider({
+		range: [1, 100],
+		start: $scope.particleCount,
 		step: 1,
-		value: $scope.particleCount,
-		slide: function (event, ui) {
-			$scope.particleCount = ui.value;
-			$scope.$apply();
-		}
+		handles: 1
+	}).change(function () {
+		$scope.particleCount = $('#particle_count_slider').val();
+		$scope.$apply();
 	});
 
-	$('#particle_draw_size_slider').slider({
-		min: 1,
-		animate: true,
-		max: 15,
-		step: 1,
-		value: $scope.particleDrawSize,
-		slide: function (event, ui) {
-			$scope.particleDrawSize = ui.value;
-			$scope.$apply();
-		}
+	$('#particle_draw_size_slider').noUiSlider({
+		range: [1, 15],
+		start: $scope.particleDrawSize,
+		handles: 1,
+		step: 1
+	}).change(function () {
+		$scope.particleDrawSize = $('#particle_draw_size_slider').val();
+		$scope.$apply();
 	});
 
-	$('#swarm_spread_slider').slider({
-		min: 0.01,
-		animate: true,
-		max: 1,
+	$('#swarm_spread_slider').noUiSlider({
+		range: [0.01, 1],
+		handles: 1,
 		step: 0.01,
-		value: $scope.swarmSpread,
-		slide: function (event, ui) {
-			$scope.swarmSpread = ui.value;
-			$scope.$apply();
-		}
+		start: $scope.swarmSpread
+	}).change(function () {
+		$scope.swarmSpread = $('#swarm_spread_slider').val();
+		$scope.$apply();
 	});
 
 	//Initialize the color selector widget
