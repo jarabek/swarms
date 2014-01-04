@@ -140,7 +140,6 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 
 	//Initialize the color selector widget
 	$('#color_select').spectrum({
-		flat: true,
 		showButtons: false,
 		showAlpha: true
 	});
@@ -181,7 +180,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	};
 
 	//Bind the window resize event to the method above
-	$( window ).resize($scope.resetDimentions);
+	$( window ).resize($scope.clear);
 
 	//Calculates the euclidian distance between two points
 	$scope.getDistance = function(x1,y1,x2,y2){
@@ -280,6 +279,7 @@ angular.module('swarmsApp').controller('SwarmsController', function ($scope) {
 	$( document ).ready($scope.resetDimentions);
 });
 
+//The drawable directive will attach mouse and touch listeners to the element
 angular.module('swarmsApp').directive('drawable', function(){
 	return function(scope){
 		//Bind all the input events to their appropriate handlers

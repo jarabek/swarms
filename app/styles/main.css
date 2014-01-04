@@ -29,6 +29,12 @@
     z-index:5;
 }
 
+.sp-replacer
+{
+    margin-left:5px;
+    padding: 6px;
+}
+
 .list-group-item{
     background-color:#555555;  
     border: 0px;  
@@ -67,7 +73,7 @@
     position:fixed;
     float:left;
     height:500px;
-    width:500px;    
+    width:500px;       
     z-index: 2;
 }
 
