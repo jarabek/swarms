@@ -11,7 +11,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'app/bower_components/angular/angular.js',
+      'app/bower_components/jquery/jquery.min.js',      
+	  'app/bower_components/nouislider/jquery.nouislider.js','app/bower_components/spectrum/spectrum.js',      	  
+	  'app/bower_components/angular/angular.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
       'app/bower_components/angular-resource/angular-resource.js',
       'app/bower_components/angular-cookies/angular-cookies.js',

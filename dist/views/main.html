@@ -1,0 +1,34 @@
+<div class="sidebar">
+ 	<div class="sidebarContent">
+		<ul class="list-group">
+			<li class="list-group-item">
+				<strong>Swarm Cohesion: {{swarmSpread}}</strong>
+				<div class="control" id="swarm_spread_slider"></div>
+			</li>
+			<li class="list-group-item">
+		  		<strong>Particle Max Velocity: {{particleMaxVelocity}}</strong>
+		  		<div class="control" id="particle_max_velocity"></div>
+		  	</li>		  	
+			<li class="list-group-item">
+				<strong>Particle Draw Size: {{particleDrawSize}}</strong>
+				<div class="control" id="particle_draw_size_slider"></div>
+			</li>
+			<li class="list-group-item">
+				 <strong>Particle Count: {{particleCount}}</strong>
+				 <div class="control" id="particle_count_slider"></div>
+			</li>
+		  	<li class="list-group-item">
+		  		<strong>Particle Colour:</strong>
+		  		<input type="text" id="color_select">
+		  	</li>
+		  	<li class="list-group-item">
+		  		<button type="text" class="btn btn-default control" ng-click="clear()" id="clear_button">Clear</button>
+		  	</li>
+
+		</ul>	  		
+	</div>
+  	<div class="divider" ng-click="toggleMenu()"></div>
+</div>
+<div class="content">
+    <canvas drawable="" id="swarm_canvas"></canvas>
+</div>
