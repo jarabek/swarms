@@ -18,7 +18,7 @@
     -webkit-background-size:100%;
     -moz-background-size:100%;
     -o-background-size:100%;
-    background-image: url('images/divider.png');
+    background-image: url('../images/divider.png');
 }
 
 .sidebar
